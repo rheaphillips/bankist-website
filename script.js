@@ -62,6 +62,7 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 const displayMovements = function (movements) {
+  containerMovements.innerHTML = '';
   movements.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
@@ -76,7 +77,56 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
+displayMovements(account2.movements);
+
+const createUsernames = function (accs) {
+  accs.forEach(function (acc, i, accs) {
+    accs[i].username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
+
+// const deposits = movements.filter(mov => mov > 0);
+
+// const deposits1 = [];
+// for (const mov of movements) if (mov > 0) deposits1.push(mov);
+
+// const deposits2 = [];
+// movements.forEach(function (mov) {
+//   if (mov > 0) deposits2.push(mov);
+// });
+
+// console.log(deposits); // [200, 450, 3000, 70, 1300]
+// console.log(deposits1);
+// console.log(deposits2);
+
+// const withdrawals = movements.filter(mov => mov < 0);
+// console.log(withdrawals);
+
+// const eurToUSD = 1.1;
+// const movementsUSD = movements.map(mov => mov * eurToUSD);
+
+// const movementsUSD1 = [];
+// for (const mov of movements) movementsUSD1.push(mov * eurToUSD);
+
+// const movementsUSD2 = [];
+// movements.forEach(map => movementsUSD2.push(map * eurToUSD));
+
+// console.log(movementsUSD);
+// console.log(movementsUSD1);
+// console.log(movementsUSD2);
+
+// const movementsDescriptions = movements.map(
+//   (mov, i) =>
+//     `Movement ${i + 1}: You ${mov > 0 ? 'deposited' : 'withdrew'} ${Math.abs(
+//       mov
+//     )}`
+// );
+
+// console.log(movementsDescriptions);
 
 // /////////////////////////////////////////////////
 // /////////////////////////////////////////////////
