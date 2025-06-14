@@ -61,6 +61,27 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+let currentUser, timer;
+let balance = 0;
+let time = 300;
+let sorted = false;
+
+const sum = nums => nums.reduce((acc, num) => acc + num, 0);
+
+const sort = function (movements) {
+  const sortedMovements = [...movements];
+  for (let i = 0; i < movements.length; i++) {
+    for (let j = i; j > 0; j--) {
+      if (sortedMovements[j] < sortedMovements[j - 1])
+        [sortedMovements[j], sortedMovements[j - 1]] = [
+          sortedMovements[j - 1],
+          sortedMovements[j],
+        ];
+    }
+  }
+  return sortedMovements;
+};
+
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -81,18 +102,12 @@ const displayMovements = function (movements) {
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov}</div>
+        <div class="movements__value">${mov} €</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-
-const sum = nums => nums.reduce((acc, num) => acc + num, 0);
-
-let currentUser, timer;
-let balance = 0;
-let time = 300;
 
 const displayBalance = function (movements) {
   balance = sum(movements);
@@ -130,7 +145,9 @@ const displayDate = function () {
 };
 
 const displayAccount = function (account, time) {
-  displayMovements(account.movements);
+  sorted
+    ? displayMovements(sort(currentUser.movements))
+    : displayMovements(currentUser.movements);
   displayBalance(account.movements);
   displayDeposit(account.movements);
   displayWithdrawl(account.movements);
@@ -208,6 +225,13 @@ btnClose.addEventListener('click', function () {
     inputCloseUsername.value = '';
     inputClosePin.value = '';
   }
+});
+
+btnSort.addEventListener('click', function () {
+  sorted
+    ? displayMovements(currentUser.movements)
+    : displayMovements(sort(currentUser.movements));
+  sorted = !sorted;
 });
 
 createUsernames(accounts);
