@@ -131,6 +131,8 @@ btnLogin.addEventListener('click', function () {
       containerApp.style.opacity = 1;
       currentUser = acc;
       displayAllFinances(currentUser);
+      inputLoginUsername.value = '';
+      inputLoginPin.value = '';
     }
   });
 });
@@ -147,6 +149,8 @@ btnTransfer.addEventListener('click', function () {
     ) {
       acc.movements.push(transerAmount);
       currentUser.movements.push(-1 * transerAmount);
+      inputTransferTo.value = '';
+      inputTransferAmount.value = '';
     }
   });
   displayAllFinances(currentUser);
@@ -154,7 +158,10 @@ btnTransfer.addEventListener('click', function () {
 
 btnLoan.addEventListener('click', function () {
   const loanAmount = Number(inputLoanAmount.value);
-  if (loanAmount > 0) currentUser.movements.push(loanAmount);
+  if (loanAmount > 0) {
+    currentUser.movements.push(loanAmount);
+    inputLoanAmount.value = '';
+  }
   displayAllFinances(currentUser);
 });
 
