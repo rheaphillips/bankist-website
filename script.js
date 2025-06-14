@@ -94,13 +94,18 @@ const displayBalance = function (movements) {
   labelBalance.textContent = sum(movements) + ' €';
 };
 
-const displayDeposits = function (movements) {
+const displayDeposit = function (movements) {
   labelSumIn.textContent = sum(movements.filter(mov => mov > 0)) + ' €';
 };
 
-const displayWithdrawls = function (movements) {
+const displayWithdrawl = function (movements) {
   labelSumOut.textContent =
     Math.abs(sum(movements.filter(mov => mov < 0))) + ' €';
+};
+
+const displayInterest = function (account) {
+  labelSumInterest.textContent =
+    (sum(account.movements) * account.interestRate) / 100 + ' €';
 };
 
 let currentUser;
