@@ -61,7 +61,6 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 let currentUser,
   timer,
-  balance = 0,
   interest = 0,
   time = 300,
   sorted = false;
@@ -82,8 +81,8 @@ const sort = function (movements) {
   return sortedMovements;
 };
 
-const createUsernames = function (accs) {
-  accs.forEach(function (acc) {
+const createUsernames = function (accounts) {
+  accounts.forEach(function (acc) {
     acc.username = acc.owner
       .toLowerCase()
       .split(' ')
@@ -109,19 +108,18 @@ const displayMovements = function (movements) {
   });
 };
 
-const displayBalance = function (movements, interest) {
-  balance = sum(movements) + interest;
-  labelBalance.textContent = balance + ' €';
-};
-
 const displaySummary = function (account) {
   const income = sum(account.movements.filter(mov => mov > 0));
   const out = Math.abs(sum(account.movements.filter(mov => mov < 0)));
-  interest = (sum(account.movements) * account.interestRate) / 100;
+  account.interest = (sum(account.movements) * account.interestRate) / 100;
   labelSumIn.textContent = `${income} €`;
   labelSumOut.textContent = `${out} €`;
-  labelSumInterest.textContent = `${interest} €`;
-  return interest;
+  labelSumInterest.textContent = `${account.interest} €`;
+};
+
+const displayBalance = function (account) {
+  account.balance = sum(account.movements) + account.interest;
+  labelBalance.textContent = account.balance + ' €';
 };
 
 const displayTime = function (time) {
@@ -161,7 +159,7 @@ const displayAccount = function (account, time) {
     ? displayMovements(sort(currentUser.movements))
     : displayMovements(currentUser.movements);
   displaySummary(account);
-  displayBalance(account.movements, interest);
+  displayBalance(account);
   displayTime(time);
   displayDate();
 };
@@ -182,10 +180,21 @@ btnLogin.addEventListener('click', function () {
   );
 
   if (currentUser) {
+    // Display UI
     containerApp.style.opacity = 1;
-    inputLoginUsername.value = '';
-    inputLoginPin.value = '';
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Displays all content related to account
     displayAccount(currentUser, time);
+
+    // Resets time and removes timer
+    time = 300;
+    if (timer) window.clearInterval(timer);
+
+    // Starts timer
     timer = window.setInterval(function () {
       time--;
       displayTime(time);
@@ -195,21 +204,27 @@ btnLogin.addEventListener('click', function () {
 });
 
 btnTransfer.addEventListener('click', function () {
-  const transferUsername = inputTransferTo.value;
-  const transerAmount = Number(inputTransferAmount.value);
+  const amount = Number(inputTransferAmount.value);
+  const receivingUser = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
 
-  accounts.forEach(function (acc) {
-    if (
-      acc.username != currentUser.username &&
-      acc.username === transferUsername &&
-      transerAmount <= balance
-    ) {
-      acc.movements.push(transerAmount);
-      currentUser.movements.push(-1 * transerAmount);
-      inputTransferTo.value = '';
-      inputTransferAmount.value = '';
-    }
-  });
+  // Process transfer if the amount is within the balance and greater than 0, and the user exists
+  if (
+    amount > 0 &&
+    receivingUser &&
+    amount <= currentUser.balance &&
+    receivingUser?.username != currentUser.username
+  ) {
+    // Add deposit and withdrawl amount to movements of the accounts
+    receivingUser.movements.push(amount);
+    currentUser.movements.push(-1 * amount);
+
+    // Clear input fields
+    inputTransferTo.value = inputTransferAmount.value = '';
+  }
+
+  // Update balance, movements, and summary
   displayAccount(currentUser, time);
 });
 
@@ -231,8 +246,7 @@ btnClose.addEventListener('click', function () {
     accounts.forEach((account, index) => {
       if (account.username == currentUser.username) accounts.splice(index, 1);
     });
-    inputCloseUsername.value = '';
-    inputClosePin.value = '';
+    inputCloseUsername.value = inputClosePin.value = '';
   }
 });
 
