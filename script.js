@@ -88,9 +88,19 @@ const displayMovements = function (movements) {
   });
 };
 
-const displayBalance = function (account) {
-  labelBalance.textContent =
-    account.movements.reduce((acc, cur) => acc + cur, 0) + ' €';
+const sum = nums => nums.reduce((acc, num) => acc + num, 0);
+
+const displayBalance = function (movements) {
+  labelBalance.textContent = sum(movements) + ' €';
+};
+
+const displayDeposits = function (movements) {
+  labelSumIn.textContent = sum(movements.filter(mov => mov > 0)) + ' €';
+};
+
+const displayWithdrawls = function (movements) {
+  labelSumOut.textContent =
+    Math.abs(sum(movements.filter(mov => mov < 0))) + ' €';
 };
 
 let currentUser;
@@ -105,7 +115,10 @@ btnLogin.addEventListener('click', function () {
       containerApp.style.opacity = 1;
       currentUser = acc;
       displayMovements(currentUser.movements);
-      displayBalance(currentUser);
+      displayBalance(currentUser.movements);
+      displayDeposits(currentUser.movements);
+      displayWithdrawls(currentUser.movements);
+      displayInterest(currentUser);
     }
   });
 });
