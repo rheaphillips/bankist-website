@@ -169,29 +169,29 @@ const displayAccount = function (account, time) {
 const closeAccount = function () {
   labelWelcome.textContent = `Log in to get started`;
   containerApp.style.opacity = 0;
-  currentUser = null;
+  currentUser = undefined;
   window.clearInterval(timer);
   time = 300;
 };
 
 btnLogin.addEventListener('click', function () {
-  accounts.forEach(function (acc) {
-    if (
+  currentUser = accounts.find(
+    acc =>
       acc.username === inputLoginUsername.value &&
       acc.pin === Number(inputLoginPin.value)
-    ) {
-      containerApp.style.opacity = 1;
-      currentUser = acc;
-      displayAccount(currentUser, time);
-      inputLoginUsername.value = '';
-      inputLoginPin.value = '';
-      timer = window.setInterval(function () {
-        time--;
-        displayTime(time);
-        if (time == 0) closeAccount();
-      }, 1000);
-    }
-  });
+  );
+
+  if (currentUser) {
+    containerApp.style.opacity = 1;
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    displayAccount(currentUser, time);
+    timer = window.setInterval(function () {
+      time--;
+      displayTime(time);
+      if (time == 0) closeAccount();
+    }, 1000);
+  }
 });
 
 btnTransfer.addEventListener('click', function () {
