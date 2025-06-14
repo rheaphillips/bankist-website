@@ -1,7 +1,5 @@
 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 // BANKIST APP
 
 // Data
@@ -144,7 +142,23 @@ const displayDate = function () {
   ).padStart(2, '0')}`;
 };
 
+const displayGreeting = function (account) {
+  const hour = new Date().getHours();
+  let greeting;
+  if (hour < 12) {
+    greeting = 'Morning';
+  } else if (hour >= 12 && hour <= 16) {
+    greeting = 'Afternoon';
+  } else {
+    greeting = 'Evening';
+  }
+  labelWelcome.textContent = `Good ${greeting}, ${
+    account.owner.split(' ')[0]
+  }!`;
+};
+
 const displayAccount = function (account, time) {
+  displayGreeting(account);
   sorted
     ? displayMovements(sort(currentUser.movements))
     : displayMovements(currentUser.movements);
@@ -170,7 +184,6 @@ btnLogin.addEventListener('click', function () {
       acc.username === inputLoginUsername.value &&
       acc.pin === Number(inputLoginPin.value)
     ) {
-      labelWelcome.textContent = `Good Evening, ${acc.owner.split(' ')[0]}!`;
       containerApp.style.opacity = 1;
       currentUser = acc;
       displayAccount(currentUser, time);
