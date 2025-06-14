@@ -59,10 +59,12 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currentUser, timer;
-let balance = 0;
-let time = 300;
-let sorted = false;
+let currentUser,
+  timer,
+  balance = 0,
+  interest = 0,
+  time = 300,
+  sorted = false;
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
@@ -107,23 +109,19 @@ const displayMovements = function (movements) {
   });
 };
 
-const displayBalance = function (movements) {
-  balance = sum(movements);
+const displayBalance = function (movements, interest) {
+  balance = sum(movements) + interest;
   labelBalance.textContent = balance + ' €';
 };
 
-const displayDeposit = function (movements) {
-  labelSumIn.textContent = sum(movements.filter(mov => mov > 0)) + ' €';
-};
-
-const displayWithdrawl = function (movements) {
-  labelSumOut.textContent =
-    Math.abs(sum(movements.filter(mov => mov < 0))) + ' €';
-};
-
-const displayInterest = function (account) {
-  labelSumInterest.textContent =
-    (sum(account.movements) * account.interestRate) / 100 + ' €';
+const displaySummary = function (account) {
+  const income = sum(account.movements.filter(mov => mov > 0));
+  const out = Math.abs(sum(account.movements.filter(mov => mov < 0)));
+  interest = (sum(account.movements) * account.interestRate) / 100;
+  labelSumIn.textContent = `${income} €`;
+  labelSumOut.textContent = `${out} €`;
+  labelSumInterest.textContent = `${interest} €`;
+  return interest;
 };
 
 const displayTime = function (time) {
@@ -162,10 +160,8 @@ const displayAccount = function (account, time) {
   sorted
     ? displayMovements(sort(currentUser.movements))
     : displayMovements(currentUser.movements);
-  displayBalance(account.movements);
-  displayDeposit(account.movements);
-  displayWithdrawl(account.movements);
-  displayInterest(account);
+  displaySummary(account);
+  displayBalance(account.movements, interest);
   displayTime(time);
   displayDate();
 };
