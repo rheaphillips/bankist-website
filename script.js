@@ -242,10 +242,13 @@ btnClose.addEventListener('click', function () {
     currentUser.username === inputCloseUsername.value &&
     currentUser.pin === Number(inputClosePin.value)
   ) {
+    const index = accounts.findIndex(
+      account => account.username === currentUser.username
+    );
+    accounts.splice(index, 1);
+
     closeAccount();
-    accounts.forEach((account, index) => {
-      if (account.username == currentUser.username) accounts.splice(index, 1);
-    });
+
     inputCloseUsername.value = inputClosePin.value = '';
   }
 });
