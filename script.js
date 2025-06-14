@@ -90,8 +90,11 @@ const displayMovements = function (movements) {
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
+let balance = 0;
+
 const displayBalance = function (movements) {
-  labelBalance.textContent = sum(movements) + ' €';
+  balance = sum(movements);
+  labelBalance.textContent = balance + ' €';
 };
 
 const displayDeposit = function (movements) {
@@ -108,6 +111,14 @@ const displayInterest = function (account) {
     (sum(account.movements) * account.interestRate) / 100 + ' €';
 };
 
+const displayAllFinances = function (account) {
+  displayMovements(account.movements);
+  displayBalance(account.movements);
+  displayDeposit(account.movements);
+  displayWithdrawl(account.movements);
+  displayInterest(account);
+};
+
 let currentUser;
 
 btnLogin.addEventListener('click', function () {
@@ -119,13 +130,26 @@ btnLogin.addEventListener('click', function () {
       labelWelcome.textContent = `Good Evening, ${acc.owner.split(' ')[0]}!`;
       containerApp.style.opacity = 1;
       currentUser = acc;
-      displayMovements(currentUser.movements);
-      displayBalance(currentUser.movements);
-      displayDeposits(currentUser.movements);
-      displayWithdrawls(currentUser.movements);
-      displayInterest(currentUser);
+      displayAllFinances(currentUser);
     }
   });
+});
+
+btnTransfer.addEventListener('click', function () {
+  const transferUsername = inputTransferTo.value;
+  const transerAmount = inputTransferAmount.value;
+
+  accounts.forEach(function (acc) {
+    if (
+      acc.username != currentUser.username &&
+      acc.username === transferUsername &&
+      transerAmount <= balance
+    ) {
+      acc.movements.push(Number(inputTransferAmount.value));
+      currentUser.movements.push(-1 * Number(inputTransferAmount.value));
+    }
+  });
+  displayAllFinances(currentUser);
 });
 
 createUsernames(accounts);
