@@ -137,7 +137,7 @@ btnLogin.addEventListener('click', function () {
 
 btnTransfer.addEventListener('click', function () {
   const transferUsername = inputTransferTo.value;
-  const transerAmount = inputTransferAmount.value;
+  const transerAmount = Number(inputTransferAmount.value);
 
   accounts.forEach(function (acc) {
     if (
@@ -145,10 +145,16 @@ btnTransfer.addEventListener('click', function () {
       acc.username === transferUsername &&
       transerAmount <= balance
     ) {
-      acc.movements.push(Number(inputTransferAmount.value));
-      currentUser.movements.push(-1 * Number(inputTransferAmount.value));
+      acc.movements.push(transerAmount);
+      currentUser.movements.push(-1 * transerAmount);
     }
   });
+  displayAllFinances(currentUser);
+});
+
+btnLoan.addEventListener('click', function () {
+  const loanAmount = Number(inputLoanAmount.value);
+  if (loanAmount > 0) currentUser.movements.push(loanAmount);
   displayAllFinances(currentUser);
 });
 
