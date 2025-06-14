@@ -90,7 +90,9 @@ const displayMovements = function (movements) {
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
+let currentUser, timer;
 let balance = 0;
+let time = 300;
 
 const displayBalance = function (movements) {
   balance = sum(movements);
@@ -111,15 +113,29 @@ const displayInterest = function (account) {
     (sum(account.movements) * account.interestRate) / 100 + ' €';
 };
 
-const displayAllFinances = function (account) {
+const displayTime = function (time) {
+  const minutes = Math.trunc(time / 60);
+  labelTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(
+    time - minutes * 60
+  ).padStart(2, '0')}`;
+};
+
+const displayAccount = function (account, time) {
   displayMovements(account.movements);
   displayBalance(account.movements);
   displayDeposit(account.movements);
   displayWithdrawl(account.movements);
   displayInterest(account);
+  displayTime(time);
 };
 
-let currentUser;
+const closeAccount = function () {
+  labelWelcome.textContent = `Log in to get started`;
+  containerApp.style.opacity = 0;
+  currentUser = null;
+  window.clearInterval(timer);
+  time = 300;
+};
 
 btnLogin.addEventListener('click', function () {
   accounts.forEach(function (acc) {
@@ -130,9 +146,14 @@ btnLogin.addEventListener('click', function () {
       labelWelcome.textContent = `Good Evening, ${acc.owner.split(' ')[0]}!`;
       containerApp.style.opacity = 1;
       currentUser = acc;
-      displayAllFinances(currentUser);
+      displayAccount(currentUser, time);
       inputLoginUsername.value = '';
       inputLoginPin.value = '';
+      timer = window.setInterval(function () {
+        time--;
+        displayTime(time);
+        if (time == 0) closeAccount();
+      }, 1000);
     }
   });
 });
@@ -153,7 +174,7 @@ btnTransfer.addEventListener('click', function () {
       inputTransferAmount.value = '';
     }
   });
-  displayAllFinances(currentUser);
+  displayAccount(currentUser, time);
 });
 
 btnLoan.addEventListener('click', function () {
@@ -162,7 +183,7 @@ btnLoan.addEventListener('click', function () {
     currentUser.movements.push(loanAmount);
     inputLoanAmount.value = '';
   }
-  displayAllFinances(currentUser);
+  displayAccount(currentUser, time);
 });
 
 btnClose.addEventListener('click', function () {
@@ -170,12 +191,10 @@ btnClose.addEventListener('click', function () {
     currentUser.username === inputCloseUsername.value &&
     currentUser.pin === Number(inputClosePin.value)
   ) {
-    labelWelcome.textContent = `Log in to get started`;
-    containerApp.style.opacity = 0;
+    closeAccount();
     accounts.forEach((account, index) => {
       if (account.username == currentUser.username) accounts.splice(index, 1);
     });
-    currentUser = null;
     inputCloseUsername.value = '';
     inputClosePin.value = '';
   }
