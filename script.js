@@ -165,4 +165,20 @@ btnLoan.addEventListener('click', function () {
   displayAllFinances(currentUser);
 });
 
+btnClose.addEventListener('click', function () {
+  if (
+    currentUser.username === inputCloseUsername.value &&
+    currentUser.pin === Number(inputClosePin.value)
+  ) {
+    labelWelcome.textContent = `Log in to get started`;
+    containerApp.style.opacity = 0;
+    accounts.forEach((account, index) => {
+      if (account.username == currentUser.username) accounts.splice(index, 1);
+    });
+    currentUser = null;
+    inputCloseUsername.value = '';
+    inputClosePin.value = '';
+  }
+});
+
 createUsernames(accounts);
