@@ -120,6 +120,15 @@ const displayTime = function (time) {
   ).padStart(2, '0')}`;
 };
 
+const displayDate = function () {
+  const date = new Date();
+  labelDate.textContent = `${String(date.getDate()).padStart(2, '0')}/${String(
+    date.getMonth()
+  ).padStart(2, '0')}/${date.getFullYear()}, ${date.getHours()}:${String(
+    date.getMinutes()
+  ).padStart(2, '0')}`;
+};
+
 const displayAccount = function (account, time) {
   displayMovements(account.movements);
   displayBalance(account.movements);
@@ -127,6 +136,7 @@ const displayAccount = function (account, time) {
   displayWithdrawl(account.movements);
   displayInterest(account);
   displayTime(time);
+  displayDate();
 };
 
 const closeAccount = function () {
