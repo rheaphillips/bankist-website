@@ -230,7 +230,10 @@ btnTransfer.addEventListener('click', function () {
 
 btnLoan.addEventListener('click', function () {
   const loanAmount = Number(inputLoanAmount.value);
-  if (loanAmount > 0) {
+  if (
+    loanAmount > 0 &&
+    currentUser.movements.some(mov => mov >= 0.1 * loanAmount)
+  ) {
     currentUser.movements.push(loanAmount);
     inputLoanAmount.value = '';
   }
