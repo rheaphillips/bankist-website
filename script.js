@@ -5,9 +5,22 @@
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
-  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
+  movements: [200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+
+  movementsDates: [
+    '2019-11-18T21:31:17.178Z',
+    '2019-12-23T07:42:02.383Z',
+    '2020-01-28T09:15:04.904Z',
+    '2020-04-01T10:17:24.185Z',
+    '2020-05-08T14:11:59.604Z',
+    '2020-05-27T17:01:17.194Z',
+    '2020-07-11T23:36:17.929Z',
+    '2020-07-12T10:51:36.790Z',
+  ],
+  currency: 'EUR',
+  locale: 'pt-PT', // de-DE
 };
 
 const account2 = {
@@ -15,6 +28,19 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+
+  movementsDates: [
+    '2019-11-01T13:15:33.035Z',
+    '2019-11-30T09:48:16.867Z',
+    '2019-12-25T06:04:23.907Z',
+    '2020-01-25T14:18:46.235Z',
+    '2020-02-05T16:33:06.386Z',
+    '2020-04-10T14:43:26.374Z',
+    '2020-06-25T18:49:59.371Z',
+    '2020-07-26T12:01:20.894Z',
+  ],
+  currency: 'USD',
+  locale: 'en-US',
 };
 
 const account3 = {
@@ -22,6 +48,20 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+
+  movementsDates: [
+    '2021-02-14T11:23:45.678Z',
+    '2021-03-30T09:12:01.234Z',
+    '2021-06-05T16:44:33.987Z',
+    '2021-08-20T08:10:22.543Z',
+    '2021-09-14T19:55:14.120Z',
+    '2021-10-29T21:03:47.876Z',
+    '2021-12-01T13:37:29.300Z',
+    '2021-12-15T07:18:56.432Z',
+  ],
+
+  currency: 'USD',
+  locale: 'en-US', // de-DE
 };
 
 const account4 = {
@@ -29,6 +69,20 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+
+  movementsDates: [
+    '2018-03-15T10:22:31.456Z',
+    '2019-07-08T14:49:12.789Z',
+    '2020-11-02T09:17:55.321Z',
+    '2021-01-19T18:33:47.654Z',
+    '2022-04-27T07:28:11.908Z',
+    '2023-06-10T12:41:33.120Z',
+    '2024-09-05T20:03:22.444Z',
+    '2025-02-12T06:14:59.678Z',
+  ],
+
+  currency: 'EUR',
+  locale: 'pt-PT', // de-DE
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -235,9 +289,9 @@ btnLoan.addEventListener('click', function () {
     currentUser.movements.some(mov => mov >= 0.1 * loanAmount)
   ) {
     currentUser.movements.push(loanAmount);
-    inputLoanAmount.value = '';
+    displayAccount(currentUser, time);
   }
-  displayAccount(currentUser, time);
+  inputLoanAmount.value = '';
 });
 
 btnClose.addEventListener('click', function () {
@@ -264,3 +318,5 @@ btnSort.addEventListener('click', function () {
 });
 
 createUsernames(accounts);
+
+console.log(accounts.map(account => account.movements).flat());
