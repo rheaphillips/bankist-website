@@ -155,7 +155,7 @@ const displayMovements = function (movements) {
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov} €</div>
+        <div class="movements__value">${mov.toFixed(2)} €</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -166,14 +166,14 @@ const displaySummary = function (account) {
   const income = sum(account.movements.filter(mov => mov > 0));
   const out = Math.abs(sum(account.movements.filter(mov => mov < 0)));
   account.interest = (sum(account.movements) * account.interestRate) / 100;
-  labelSumIn.textContent = `${income} €`;
-  labelSumOut.textContent = `${out} €`;
-  labelSumInterest.textContent = `${account.interest} €`;
+  labelSumIn.textContent = `${income.toFixed(2)} €`;
+  labelSumOut.textContent = `${out.toFixed(2)} €`;
+  labelSumInterest.textContent = `${account.interest.toFixed(2)} €`;
 };
 
 const displayBalance = function (account) {
   account.balance = sum(account.movements) + account.interest;
-  labelBalance.textContent = account.balance + ' €';
+  labelBalance.textContent = account.balance.toFixed(2) + ' €';
 };
 
 const displayTime = function (time) {
@@ -218,6 +218,33 @@ const displayAccount = function (account, time) {
   displayDate();
 };
 
+const openAccount = function(currentUser) {
+  // Display UI
+  containerApp.style.opacity = 1;
+
+  // Clear input fields
+  inputLoginUsername.value = inputLoginPin.value = '';
+  inputLoginPin.blur();
+
+  // Displays all content related to account
+  displayAccount(currentUser, time);
+
+  // Resets time and removes timer
+  time = 300;
+  if (timer) window.clearInterval(timer);
+
+  // Starts timer
+  timer = window.setInterval(function () {
+    time--;
+    displayTime(time);
+    if (time == 0) closeAccount();
+  }, 1000);
+
+  [...document.querySelectorAll('.movements__row')].forEach(function(row, i) {
+    if (i % 2 === 0) row.style.backgroundColor = 'aliceblue';
+  });
+}
+
 const closeAccount = function () {
   labelWelcome.textContent = `Log in to get started`;
   containerApp.style.opacity = 0;
@@ -230,35 +257,14 @@ btnLogin.addEventListener('click', function () {
   currentUser = accounts.find(
     acc =>
       acc.username === inputLoginUsername.value &&
-      acc.pin === Number(inputLoginPin.value)
+      acc.pin === +inputLoginPin.value
   );
 
-  if (currentUser) {
-    // Display UI
-    containerApp.style.opacity = 1;
-
-    // Clear input fields
-    inputLoginUsername.value = inputLoginPin.value = '';
-    inputLoginPin.blur();
-
-    // Displays all content related to account
-    displayAccount(currentUser, time);
-
-    // Resets time and removes timer
-    time = 300;
-    if (timer) window.clearInterval(timer);
-
-    // Starts timer
-    timer = window.setInterval(function () {
-      time--;
-      displayTime(time);
-      if (time == 0) closeAccount();
-    }, 1000);
-  }
+  if (currentUser) openAccount(currentUser);
 });
 
 btnTransfer.addEventListener('click', function () {
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const receivingUser = accounts.find(
     acc => acc.username === inputTransferTo.value
   );
@@ -283,7 +289,7 @@ btnTransfer.addEventListener('click', function () {
 });
 
 btnLoan.addEventListener('click', function () {
-  const loanAmount = Number(inputLoanAmount.value);
+  const loanAmount = Math.floor(inputLoanAmount.value);
   if (
     loanAmount > 0 &&
     currentUser.movements.some(mov => mov >= 0.1 * loanAmount)
@@ -297,7 +303,7 @@ btnLoan.addEventListener('click', function () {
 btnClose.addEventListener('click', function () {
   if (
     currentUser.username === inputCloseUsername.value &&
-    currentUser.pin === Number(inputClosePin.value)
+    currentUser.pin === +inputClosePin.value
   ) {
     const index = accounts.findIndex(
       account => account.username === currentUser.username
@@ -320,3 +326,6 @@ btnSort.addEventListener('click', function () {
 createUsernames(accounts);
 
 console.log(accounts.map(account => account.movements).flat());
+
+currentUser = account1;
+openAccount(currentUser);
