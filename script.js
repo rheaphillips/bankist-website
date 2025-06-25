@@ -154,9 +154,12 @@ const displayMovements = function (account) {
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-    
+
     const timeSince = new Date() - new Date(dates[i]);
-    const formatedDate = timeSince <= 7*dayLength ? `${Math.floor(timeSince/dayLength)} days ago` : formatDate(new Date(dates[i]));
+    let formatedDate;
+    if (timeSince < dayLength) formatedDate = 'Today';
+    else if (timeSince <= 7*dayLength) formatedDate = `${Math.floor(timeSince/dayLength)} days ago`;
+    else formatedDate = formatDate(new Date(dates[i]));
 
     const html = `
       <div class="movements__row">
@@ -211,16 +214,11 @@ const displayDate = function () {
 const displayGreeting = function (account) {
   const hour = new Date().getHours();
   let greeting;
-  if (hour < 12) {
-    greeting = 'Morning';
-  } else if (hour >= 12 && hour <= 16) {
-    greeting = 'Afternoon';
-  } else {
-    greeting = 'Evening';
-  }
-  labelWelcome.textContent = `Good ${greeting}, ${
-    account.owner.split(' ')[0]
-  }!`;
+  if (hour < 12) greeting = 'Morning';
+  else if (hour >= 12 && hour <= 16) greeting = 'Afternoon';
+  else greeting = 'Evening';
+
+  labelWelcome.textContent = `Good ${greeting}, ${account.owner.split(' ')[0]}!`;
 };
 
 const displayAccount = function (account, time) {
@@ -292,7 +290,9 @@ btnTransfer.addEventListener('click', function () {
   ) {
     // Add deposit and withdrawl amount to movements of the accounts
     receivingUser.movements.push(amount);
+    receivingUser.movementsDates.push(new Date());
     currentUser.movements.push(-1 * amount);
+    currentUser.movementsDates.push(new Date());
 
     // Clear input fields
     inputTransferTo.value = inputTransferAmount.value = '';
@@ -309,6 +309,7 @@ btnLoan.addEventListener('click', function () {
     currentUser.movements.some(mov => mov >= 0.1 * loanAmount)
   ) {
     currentUser.movements.push(loanAmount);
+    currentUser.movementsDates.push(new Date());
     displayAccount(currentUser, time);
   }
   inputLoanAmount.value = '';
