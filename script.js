@@ -17,8 +17,8 @@ const account1 = {
     '2020-05-27T17:01:17.194Z',
     '2020-07-11T23:36:17.929Z',
     '2025-05-12T10:51:36.790Z',
-    '2025-06-18T10:51:36.790Z',
-    '2025-06-20T21:31:17.178Z'
+    '2025-06-20T10:51:36.790Z',
+    '2025-06-23T21:31:17.178Z'
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -138,22 +138,14 @@ const displayMovements = function (account) {
   let movementsData = account.movements.map((mov, i) => ({mov, date: account.movementsDates[i]}));
   if (sorted) movementsData = movementsData.sort((a, b) => a.mov - b.mov);
 
-  let dayLength = 24*60*60*1000;
-
   movementsData.forEach(function (data, i) {
-    const type = data.mov > 0 ? 'deposit' : 'withdrawal';
-
-    const timeSince = new Date() - new Date(data.date);
-    let formatedDate;
-    if (timeSince < dayLength) formatedDate = 'Today';
-    else if (timeSince <= 7*dayLength) formatedDate = `${Math.floor(timeSince/dayLength)} days ago`;
-    else formatedDate = formatDate(new Date(data.date));
-
+    const { mov, date } = data;
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-        <div class="movements__date">${formatedDate}</div>
-        <div class="movements__value">${data.mov.toFixed(2)} €</div>
+        <div class="movements__date">${formatMovementDate(date)}</div>
+        <div class="movements__value">${mov.toFixed(2)} €</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -181,16 +173,24 @@ const displayTimer = function (time) {
   ).padStart(2, '0')}`;
 };
 
-const formatDate = function (fullDate) {
-  const day = String(fullDate.getDate()).padStart(2, '0');
-  const month = String(fullDate.getMonth()).padStart(2, '0');
-  const year = fullDate.getFullYear();
+const formatDate = function (date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth()).padStart(2, '0');
+  const year = date.getFullYear();
   return `${day}/${month}/${year}`
 }
 
-const formatTime = function (fullDate) {
-  const hour = fullDate.getHours();
-  const minute = String(fullDate.getMinutes()).padStart(2, '0');
+const formatMovementDate = function (date) {
+  const daysSince = Math.floor((new Date() - new Date(date))/(24*60*60*1000));
+  if (daysSince === 0) return 'Today';
+  if (daysSince === 1) return 'Yesterday';
+  if (daysSince <= 7) return `${daysSince} days ago`;
+  return formatDate(new Date(date));
+}
+
+const formatTime = function (date) {
+  const hour = date.getHours();
+  const minute = String(date.getMinutes()).padStart(2, '0');
   return `${hour}:${minute}`
 }
 
