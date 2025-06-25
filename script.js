@@ -10,7 +10,7 @@ const account1 = {
   pin: 1111,
 
   movementsDates: [
-    '2019-11-18T21:31:17.178Z',
+    '2025-06-20T21:31:17.178Z',
     '2019-12-23T07:42:02.383Z',
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
@@ -145,16 +145,19 @@ const createUsernames = function (accounts) {
   });
 };
 
-const displayMovements = function (movements) {
+const displayMovements = function (account) {
   containerMovements.innerHTML = '';
-  movements.forEach(function (mov, i) {
-    const type = mov > 0 ? 'deposit' : 'withdrawal';
 
+  let movs = sorted ? sort(account.movements) : account.movements;
+  movs.forEach(function (mov, i) {
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
+    const movDate = new Date(account.movementsDates[i])
+    const timeSince = new Date() - movDate;
+    const formatedDate = timeSince <= 7*24*60*60*1000 ? `${Math.floor(timeSince/(24*60*60*1000))} days ago` : formatDate(movDate);
     const html = `
       <div class="movements__row">
-        <div class="movements__type movements__type--${type}">${
-      i + 1
-    } ${type}</div>
+        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+        <div class="movements__date">${formatedDate}</div>
         <div class="movements__value">${mov.toFixed(2)} €</div>
       </div>`;
 
@@ -176,20 +179,29 @@ const displayBalance = function (account) {
   labelBalance.textContent = account.balance.toFixed(2) + ' €';
 };
 
-const displayTime = function (time) {
+const displayTimer = function (time) {
   const minutes = Math.trunc(time / 60);
   labelTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(
     time - minutes * 60
   ).padStart(2, '0')}`;
 };
 
+const formatDate = function (fullDate) {
+  const day = String(fullDate.getDate()).padStart(2, '0');
+  const month = String(fullDate.getMonth()).padStart(2, '0');
+  const year = fullDate.getFullYear();
+  return `${day}/${month}/${year}`
+}
+
+const formatTime = function (fullDate) {
+  const hour = fullDate.getHours();
+  const minute = String(fullDate.getMinutes()).padStart(2, '0');
+  return `${hour}:${minute}`
+}
+
 const displayDate = function () {
-  const date = new Date();
-  labelDate.textContent = `${String(date.getDate()).padStart(2, '0')}/${String(
-    date.getMonth()
-  ).padStart(2, '0')}/${date.getFullYear()}, ${date.getHours()}:${String(
-    date.getMinutes()
-  ).padStart(2, '0')}`;
+  const now = new Date();
+  labelDate.textContent = `${formatDate(now)}, ${formatTime(now)}`;
 };
 
 const displayGreeting = function (account) {
@@ -209,12 +221,10 @@ const displayGreeting = function (account) {
 
 const displayAccount = function (account, time) {
   displayGreeting(account);
-  sorted
-    ? displayMovements(sort(currentUser.movements))
-    : displayMovements(currentUser.movements);
+  displayMovements(account);
   displaySummary(account);
   displayBalance(account);
-  displayTime(time);
+  displayTimer(time);
   displayDate();
 };
 
@@ -236,7 +246,7 @@ const openAccount = function(currentUser) {
   // Starts timer
   timer = window.setInterval(function () {
     time--;
-    displayTime(time);
+    displayTimer(time);
     if (time == 0) closeAccount();
   }, 1000);
 
@@ -317,10 +327,8 @@ btnClose.addEventListener('click', function () {
 });
 
 btnSort.addEventListener('click', function () {
-  sorted
-    ? displayMovements(currentUser.movements)
-    : displayMovements(sort(currentUser.movements));
   sorted = !sorted;
+  displayMovements(currentUser);
 });
 
 createUsernames(accounts);
