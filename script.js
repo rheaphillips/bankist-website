@@ -5,19 +5,20 @@
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
-  movements: [200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 1300],
+  movements: [200, 455.23, -306.5, 25000, -642.21, -133.9, 79.97, 486.69, 1300],
   interestRate: 1.2, // %
   pin: 1111,
 
   movementsDates: [
-    '2025-06-20T21:31:17.178Z',
     '2019-12-23T07:42:02.383Z',
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
     '2020-05-08T14:11:59.604Z',
     '2020-05-27T17:01:17.194Z',
     '2020-07-11T23:36:17.929Z',
-    '2020-07-12T10:51:36.790Z',
+    '2025-05-12T10:51:36.790Z',
+    '2025-06-18T10:51:36.790Z',
+    '2025-06-20T21:31:17.178Z'
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -121,18 +122,18 @@ let currentUser,
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
-const sort = function (movements) {
-  const sortedMovements = [...movements];
-  for (let i = 0; i < movements.length; i++) {
+const sort = function (account) {
+  const sortedMovements = [...account.movements];
+  const sortedDates = [...account.movementsDates];
+  for (let i = 0; i < account.movements.length; i++) {
     for (let j = i; j > 0; j--) {
-      if (sortedMovements[j] < sortedMovements[j - 1])
-        [sortedMovements[j], sortedMovements[j - 1]] = [
-          sortedMovements[j - 1],
-          sortedMovements[j],
-        ];
+      if (sortedMovements[j] < sortedMovements[j - 1]) {
+        [sortedMovements[j], sortedMovements[j - 1]] = [sortedMovements[j - 1], sortedMovements[j]];
+        [sortedDates[j], sortedDates[j - 1]] = [sortedDates[j - 1], sortedDates[j]];
+      }
     }
   }
-  return sortedMovements;
+  return [sortedMovements, sortedDates];
 };
 
 const createUsernames = function (accounts) {
@@ -148,12 +149,15 @@ const createUsernames = function (accounts) {
 const displayMovements = function (account) {
   containerMovements.innerHTML = '';
 
-  let movs = sorted ? sort(account.movements) : account.movements;
+  let [movs, dates] = sorted ? sort(account) : [account.movements, account.movementsDates];
+  let dayLength = 24*60*60*1000;
+
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-    const movDate = new Date(account.movementsDates[i])
-    const timeSince = new Date() - movDate;
-    const formatedDate = timeSince <= 7*24*60*60*1000 ? `${Math.floor(timeSince/(24*60*60*1000))} days ago` : formatDate(movDate);
+    
+    const timeSince = new Date() - new Date(dates[i]);
+    const formatedDate = timeSince <= 7*dayLength ? `${Math.floor(timeSince/dayLength)} days ago` : formatDate(new Date(dates[i]));
+
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
