@@ -144,7 +144,7 @@ const displayMovements = function (account) {
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-        <div class="movements__date">${formatMovementDate(date)}</div>
+        <div class="movements__date">${formatMovementDate(date, account.locale)}</div>
         <div class="movements__value">${mov.toFixed(2)} €</div>
       </div>`;
 
@@ -173,31 +173,15 @@ const displayTimer = function (time) {
   ).padStart(2, '0')}`;
 };
 
-const formatDate = function (date) {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth()).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`
-}
-
-const formatMovementDate = function (date) {
+const formatMovementDate = function (date, locale) {
   const daysSince = Math.floor((new Date() - new Date(date))/(24*60*60*1000));
   if (daysSince === 0) return 'Today';
   if (daysSince === 1) return 'Yesterday';
   if (daysSince <= 7) return `${daysSince} days ago`;
-  return formatDate(new Date(date));
+  return new Intl.DateTimeFormat(locale).format(new Date(date)); 
 }
 
-const formatTime = function (date) {
-  const hour = date.getHours();
-  const minute = String(date.getMinutes()).padStart(2, '0');
-  return `${hour}:${minute}`
-}
-
-const displayDate = function () {
-  const now = new Date();
-  labelDate.textContent = `${formatDate(now)}, ${formatTime(now)}`;
-};
+const displayDate = (locale) => labelDate.textContent = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: 'numeric', day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'}).format(new Date());
 
 const displayGreeting = function (account) {
   const hour = new Date().getHours();
@@ -215,7 +199,7 @@ const displayAccount = function (account, time) {
   displaySummary(account);
   displayBalance(account);
   displayTimer(time);
-  displayDate();
+  displayDate(account.locale);
 };
 
 const openAccount = function(currentUser) {
