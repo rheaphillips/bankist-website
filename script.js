@@ -122,20 +122,6 @@ let currentUser,
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
-const sort = function (account) {
-  const sortedMovements = [...account.movements];
-  const sortedDates = [...account.movementsDates];
-  for (let i = 0; i < account.movements.length; i++) {
-    for (let j = i; j > 0; j--) {
-      if (sortedMovements[j] < sortedMovements[j - 1]) {
-        [sortedMovements[j], sortedMovements[j - 1]] = [sortedMovements[j - 1], sortedMovements[j]];
-        [sortedDates[j], sortedDates[j - 1]] = [sortedDates[j - 1], sortedDates[j]];
-      }
-    }
-  }
-  return [sortedMovements, sortedDates];
-};
-
 const createUsernames = function (accounts) {
   accounts.forEach(function (acc) {
     acc.username = acc.owner
@@ -149,23 +135,25 @@ const createUsernames = function (accounts) {
 const displayMovements = function (account) {
   containerMovements.innerHTML = '';
 
-  let [movs, dates] = sorted ? sort(account) : [account.movements, account.movementsDates];
+  let movementsData = account.movements.map((mov, i) => ({mov, date: account.movementsDates[i]}));
+  if (sorted) movementsData = movementsData.sort((a, b) => a.mov - b.mov);
+
   let dayLength = 24*60*60*1000;
 
-  movs.forEach(function (mov, i) {
-    const type = mov > 0 ? 'deposit' : 'withdrawal';
+  movementsData.forEach(function (data, i) {
+    const type = data.mov > 0 ? 'deposit' : 'withdrawal';
 
-    const timeSince = new Date() - new Date(dates[i]);
+    const timeSince = new Date() - new Date(data.date);
     let formatedDate;
     if (timeSince < dayLength) formatedDate = 'Today';
     else if (timeSince <= 7*dayLength) formatedDate = `${Math.floor(timeSince/dayLength)} days ago`;
-    else formatedDate = formatDate(new Date(dates[i]));
+    else formatedDate = formatDate(new Date(data.date));
 
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
         <div class="movements__date">${formatedDate}</div>
-        <div class="movements__value">${mov.toFixed(2)} €</div>
+        <div class="movements__value">${data.mov.toFixed(2)} €</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -251,10 +239,6 @@ const openAccount = function(currentUser) {
     displayTimer(time);
     if (time == 0) closeAccount();
   }, 1000);
-
-  [...document.querySelectorAll('.movements__row')].forEach(function(row, i) {
-    if (i % 2 === 0) row.style.backgroundColor = 'aliceblue';
-  });
 }
 
 const closeAccount = function () {
@@ -290,9 +274,9 @@ btnTransfer.addEventListener('click', function () {
   ) {
     // Add deposit and withdrawl amount to movements of the accounts
     receivingUser.movements.push(amount);
-    receivingUser.movementsDates.push(new Date());
+    receivingUser.movementsDates.push(new Date().getDate.toISOString());
     currentUser.movements.push(-1 * amount);
-    currentUser.movementsDates.push(new Date());
+    currentUser.movementsDates.push(new Date().toISOString());
 
     // Clear input fields
     inputTransferTo.value = inputTransferAmount.value = '';
@@ -309,7 +293,7 @@ btnLoan.addEventListener('click', function () {
     currentUser.movements.some(mov => mov >= 0.1 * loanAmount)
   ) {
     currentUser.movements.push(loanAmount);
-    currentUser.movementsDates.push(new Date());
+    currentUser.movementsDates.push(new Date().toISOString());
     displayAccount(currentUser, time);
   }
   inputLoanAmount.value = '';
@@ -337,8 +321,6 @@ btnSort.addEventListener('click', function () {
 });
 
 createUsernames(accounts);
-
-console.log(accounts.map(account => account.movements).flat());
 
 currentUser = account1;
 openAccount(currentUser);
