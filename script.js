@@ -114,9 +114,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currentUser,
-  interest = 0,
-  sorted = false;
+let currentUser;
+let sorted = false;
+let timer = undefined;
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
 
@@ -130,18 +130,21 @@ const createUsernames = function (accounts) {
   });
 };
 
-const createTimer = function () {
+const createTimer = function (timer) {
   // Resets time and removes timer
   let time = 300;
+  displayTimer(time);
+
+  if (timer) window.clearInterval(timer);
 
   // Starts timer
-  let timer = window.setInterval(function () {
-    time--;
+  return window.setInterval(function () {
     displayTimer(time);
     if (time === 0) {
       window.clearInterval(timer);
       closeAccount();
     }
+    time--;
   }, 1000);
 };
 
@@ -171,7 +174,7 @@ const formatMoney = (value, currency, locale) =>
     currency: currency,
   }).format(value.toFixed(2));
 
-const displayMovements = function (account) {
+const displayMovements = function (account, sorted) {
   containerMovements.innerHTML = '';
 
   let movementsData = account.movements.map((mov, i) => ({
@@ -251,7 +254,7 @@ const displayGreeting = function (account) {
 
 const displayAccount = function (account) {
   displayGreeting(account);
-  displayMovements(account);
+  displayMovements(account, sorted);
   displaySummary(account);
   displayBalance(account);
   formatDate(account.locale);
@@ -267,7 +270,7 @@ const openAccount = function (currentUser) {
 
   // Displays all content related to account
   displayAccount(currentUser);
-  createTimer();
+  timer = createTimer(timer);
 };
 
 const closeAccount = function () {
@@ -287,6 +290,7 @@ btnLogin.addEventListener('click', function () {
 });
 
 btnTransfer.addEventListener('click', function () {
+  timer = createTimer(timer);
   const amount = +inputTransferAmount.value;
   const receivingUser = accounts.find(
     acc => acc.username === inputTransferTo.value
@@ -301,7 +305,7 @@ btnTransfer.addEventListener('click', function () {
   ) {
     // Add deposit and withdrawl amount to movements of the accounts
     receivingUser.movements.push(amount);
-    receivingUser.movementsDates.push(new Date().getDate.toISOString());
+    receivingUser.movementsDates.push(new Date().toISOString());
     currentUser.movements.push(-1 * amount);
     currentUser.movementsDates.push(new Date().toISOString());
 
@@ -314,6 +318,7 @@ btnTransfer.addEventListener('click', function () {
 });
 
 btnLoan.addEventListener('click', function () {
+  timer = createTimer(timer);
   const loanAmount = Math.floor(inputLoanAmount.value);
   if (
     loanAmount > 0 &&
@@ -344,10 +349,7 @@ btnClose.addEventListener('click', function () {
 
 btnSort.addEventListener('click', function () {
   sorted = !sorted;
-  displayMovements(currentUser);
+  displayMovements(currentUser, sorted);
 });
 
 createUsernames(accounts);
-
-currentUser = account1;
-openAccount(currentUser);
