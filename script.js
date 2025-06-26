@@ -18,7 +18,7 @@ const account1 = {
     '2020-07-11T23:36:17.929Z',
     '2025-05-12T10:51:36.790Z',
     '2025-06-20T10:51:36.790Z',
-    '2025-06-23T21:31:17.178Z'
+    '2025-06-23T21:31:17.178Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -135,7 +135,10 @@ const createUsernames = function (accounts) {
 const displayMovements = function (account) {
   containerMovements.innerHTML = '';
 
-  let movementsData = account.movements.map((mov, i) => ({mov, date: account.movementsDates[i]}));
+  let movementsData = account.movements.map((mov, i) => ({
+    mov,
+    date: account.movementsDates[i],
+  }));
   if (sorted) movementsData = movementsData.sort((a, b) => a.mov - b.mov);
 
   movementsData.forEach(function (data, i) {
@@ -143,8 +146,13 @@ const displayMovements = function (account) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
       <div class="movements__row">
-        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-        <div class="movements__date">${formatMovementDate(date, account.locale)}</div>
+        <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+        <div class="movements__date">${formatMovementDate(
+          date,
+          account.locale
+        )}</div>
         <div class="movements__value">${mov.toFixed(2)} €</div>
       </div>`;
 
@@ -174,14 +182,24 @@ const displayTimer = function (time) {
 };
 
 const formatMovementDate = function (date, locale) {
-  const daysSince = Math.floor((new Date() - new Date(date))/(24*60*60*1000));
+  const daysSince = Math.floor(
+    (new Date() - new Date(date)) / (24 * 60 * 60 * 1000)
+  );
   if (daysSince === 0) return 'Today';
   if (daysSince === 1) return 'Yesterday';
   if (daysSince <= 7) return `${daysSince} days ago`;
-  return new Intl.DateTimeFormat(locale).format(new Date(date)); 
-}
+  return new Intl.DateTimeFormat(locale).format(new Date(date));
+};
 
-const displayDate = (locale) => labelDate.textContent = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: 'numeric', day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'}).format(new Date());
+const displayDate = locale =>
+  (labelDate.textContent = new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    weekday: 'short',
+  }).format(new Date()));
 
 const displayGreeting = function (account) {
   const hour = new Date().getHours();
@@ -190,7 +208,9 @@ const displayGreeting = function (account) {
   else if (hour >= 12 && hour <= 16) greeting = 'Afternoon';
   else greeting = 'Evening';
 
-  labelWelcome.textContent = `Good ${greeting}, ${account.owner.split(' ')[0]}!`;
+  labelWelcome.textContent = `Good ${greeting}, ${
+    account.owner.split(' ')[0]
+  }!`;
 };
 
 const displayAccount = function (account, time) {
@@ -202,7 +222,7 @@ const displayAccount = function (account, time) {
   displayDate(account.locale);
 };
 
-const openAccount = function(currentUser) {
+const openAccount = function (currentUser) {
   // Display UI
   containerApp.style.opacity = 1;
 
@@ -223,7 +243,7 @@ const openAccount = function(currentUser) {
     displayTimer(time);
     if (time == 0) closeAccount();
   }, 1000);
-}
+};
 
 const closeAccount = function () {
   labelWelcome.textContent = `Log in to get started`;
