@@ -11,12 +11,13 @@ Bankist is a fictitious, feature-rich banking interface that includes functional
 - Automatica log out after 5 minutes of inactivity per session
 - Dynamically display date, time and monetary amounts as per account locale and currency using Intl API
 
-
-Avaliable Log in credentials:
+Avaliable Log in Credentials:
 - username: js | password: 1111
 - username: jd | password 2222
 - username: stw | password 3333
 - username: ss | password 4444
+
+![demo2](./image.png)
 
 ## Skills
 
