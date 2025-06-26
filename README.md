@@ -21,6 +21,13 @@ Avaliable Log in Credentials:
 
 https://rheaphillips.github.io/bankist-website/
 
+Avaliable Log in Credentials:
+- username: js | password: 1111
+- username: jd | password 2222
+- username: stw | password 3333
+- username: ss | password 4444
+##
+
 ![demo2](./image.png)
 
 ## Skills
