@@ -115,9 +115,7 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 let currentUser,
-  timer,
   interest = 0,
-  time = 300,
   sorted = false;
 
 const sum = nums => nums.reduce((acc, num) => acc + num, 0);
@@ -130,6 +128,21 @@ const createUsernames = function (accounts) {
       .map(name => name[0])
       .join('');
   });
+};
+
+const createTimer = function () {
+  // Resets time and removes timer
+  let time = 300;
+
+  // Starts timer
+  let timer = window.setInterval(function () {
+    time--;
+    displayTimer(time);
+    if (time === 0) {
+      window.clearInterval(timer);
+      closeAccount();
+    }
+  }, 1000);
 };
 
 const formatDate = locale =>
@@ -218,8 +231,9 @@ const displayBalance = function (account) {
 
 const displayTimer = function (time) {
   const minutes = Math.trunc(time / 60);
+  const seconds = time % 60;
   labelTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(
-    time - minutes * 60
+    seconds
   ).padStart(2, '0')}`;
 };
 
@@ -235,12 +249,11 @@ const displayGreeting = function (account) {
   }!`;
 };
 
-const displayAccount = function (account, time) {
+const displayAccount = function (account) {
   displayGreeting(account);
   displayMovements(account);
   displaySummary(account);
   displayBalance(account);
-  displayTimer(time);
   formatDate(account.locale);
 };
 
@@ -253,26 +266,14 @@ const openAccount = function (currentUser) {
   inputLoginPin.blur();
 
   // Displays all content related to account
-  displayAccount(currentUser, time);
-
-  // Resets time and removes timer
-  time = 300;
-  if (timer) window.clearInterval(timer);
-
-  // Starts timer
-  timer = window.setInterval(function () {
-    time--;
-    displayTimer(time);
-    if (time == 0) closeAccount();
-  }, 1000);
+  displayAccount(currentUser);
+  createTimer();
 };
 
 const closeAccount = function () {
   labelWelcome.textContent = `Log in to get started`;
   containerApp.style.opacity = 0;
   currentUser = undefined;
-  window.clearInterval(timer);
-  time = 300;
 };
 
 btnLogin.addEventListener('click', function () {
@@ -309,7 +310,7 @@ btnTransfer.addEventListener('click', function () {
   }
 
   // Update balance, movements, and summary
-  displayAccount(currentUser, time);
+  displayAccount(currentUser);
 });
 
 btnLoan.addEventListener('click', function () {
@@ -320,7 +321,7 @@ btnLoan.addEventListener('click', function () {
   ) {
     currentUser.movements.push(loanAmount);
     currentUser.movementsDates.push(new Date().toISOString());
-    displayAccount(currentUser, time);
+    displayAccount(currentUser);
   }
   inputLoanAmount.value = '';
 });
