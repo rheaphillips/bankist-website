@@ -6,8 +6,9 @@ Bankist is a fictitious and minimalistic online banking application that include
 - Viewing monetary transactions/movements and sorting by amount
 - Transfering money to other active accounts
 - Requesting a loan from the bank
-- Deleting their account
+- Deleting the account
 - Automatically logging out after 5 minutes of inactivity
+- Dynamically display date, time and monetary amounts as per account locale and currency using Intl API
 
 
 Avaliable Log in credentials:
@@ -21,6 +22,8 @@ Avaliable Log in credentials:
   * HTML
   * CSS
   * JavaScript
+
+Programmed purely in Vanilla JavaScript, showcasing good front-end architecture, clean coding practices, and a user-friendly financial UI. Demonstrates the effective implementation of modern ES6+ (arrow functions, destructuring, spread operator, optional chaining, etc.), extensive use of array methods like .map(), .filter(), .reduce(), .forEach(), and .find() for clean, expressive data manipulation, application of Intl API by internationalizing currency, date and time formatting, in-sync, real-time DOM Manipulation & UI Updates, state handling, basic user authentication 
 
 ## Authors
 
