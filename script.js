@@ -132,6 +132,32 @@ const createUsernames = function (accounts) {
   });
 };
 
+const formatDate = locale =>
+  (labelDate.textContent = new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    weekday: 'short',
+  }).format(new Date()));
+
+const formatMovementDate = function (date, locale) {
+  const daysSince = Math.floor(
+    (new Date() - new Date(date)) / (24 * 60 * 60 * 1000)
+  );
+  if (daysSince === 0) return 'Today';
+  if (daysSince === 1) return 'Yesterday';
+  if (daysSince <= 7) return `${daysSince} days ago`;
+  return new Intl.DateTimeFormat(locale).format(new Date(date));
+};
+
+const formatMoney = (value, currency, locale) =>
+  new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value.toFixed(2));
+
 const displayMovements = function (account) {
   containerMovements.innerHTML = '';
 
@@ -153,7 +179,11 @@ const displayMovements = function (account) {
           date,
           account.locale
         )}</div>
-        <div class="movements__value">${mov.toFixed(2)} €</div>
+        <div class="movements__value">${formatMoney(
+          mov,
+          account.currency,
+          account.locale
+        )}</div>
       </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -164,14 +194,26 @@ const displaySummary = function (account) {
   const income = sum(account.movements.filter(mov => mov > 0));
   const out = Math.abs(sum(account.movements.filter(mov => mov < 0)));
   account.interest = (sum(account.movements) * account.interestRate) / 100;
-  labelSumIn.textContent = `${income.toFixed(2)} €`;
-  labelSumOut.textContent = `${out.toFixed(2)} €`;
-  labelSumInterest.textContent = `${account.interest.toFixed(2)} €`;
+  labelSumIn.textContent = formatMoney(
+    income,
+    account.currency,
+    account.locale
+  );
+  labelSumOut.textContent = formatMoney(out, account.currency, account.locale);
+  labelSumInterest.textContent = formatMoney(
+    account.interest,
+    account.currency,
+    account.locale
+  );
 };
 
 const displayBalance = function (account) {
   account.balance = sum(account.movements) + account.interest;
-  labelBalance.textContent = account.balance.toFixed(2) + ' €';
+  labelBalance.textContent = formatMoney(
+    account.balance,
+    account.currency,
+    account.locale
+  );
 };
 
 const displayTimer = function (time) {
@@ -180,26 +222,6 @@ const displayTimer = function (time) {
     time - minutes * 60
   ).padStart(2, '0')}`;
 };
-
-const formatMovementDate = function (date, locale) {
-  const daysSince = Math.floor(
-    (new Date() - new Date(date)) / (24 * 60 * 60 * 1000)
-  );
-  if (daysSince === 0) return 'Today';
-  if (daysSince === 1) return 'Yesterday';
-  if (daysSince <= 7) return `${daysSince} days ago`;
-  return new Intl.DateTimeFormat(locale).format(new Date(date));
-};
-
-const displayDate = locale =>
-  (labelDate.textContent = new Intl.DateTimeFormat(locale, {
-    hour: 'numeric',
-    minute: 'numeric',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    weekday: 'short',
-  }).format(new Date()));
 
 const displayGreeting = function (account) {
   const hour = new Date().getHours();
@@ -219,7 +241,7 @@ const displayAccount = function (account, time) {
   displaySummary(account);
   displayBalance(account);
   displayTimer(time);
-  displayDate(account.locale);
+  formatDate(account.locale);
 };
 
 const openAccount = function (currentUser) {
