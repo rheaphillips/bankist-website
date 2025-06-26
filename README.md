@@ -22,7 +22,7 @@ Avaliable Log in credentials:
 
 Built purely with vanilla JavaScript, this application showcases advanced front-end development skills, including dynamic DOM manipulation, the effective implementation of modern ES6+ (arrow functions, destructuring, spread operator, optional chaining, etc.), internationalization with the Intl API for date, time and currency formatting, and functional programming with array methods like map, filter, and reduce, for clean data manipulation,. With a focus on clean data modeling, real-time UI updates, and locale-aware formatting, Bankist delivers a polished, user-centric experience without relying on external libraries or frameworks.
 
-## Authors
+## Author
 
 **Rhea Phillips**
 [rheaphillips](https://github.com/rheaphillips)
